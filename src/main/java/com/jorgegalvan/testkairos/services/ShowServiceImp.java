@@ -1,9 +1,7 @@
 package com.jorgegalvan.testkairos.services;
 
 import com.jorgegalvan.testkairos.clients.TvMazeClient;
-import com.jorgegalvan.testkairos.dto.ComentarioRequest;
-import com.jorgegalvan.testkairos.dto.ComentarioResponse;
-import com.jorgegalvan.testkairos.dto.ShowDto;
+import com.jorgegalvan.testkairos.dto.*;
 import com.jorgegalvan.testkairos.mappers.ComentarioMapper;
 import com.jorgegalvan.testkairos.mappers.ShowMapper;
 import com.jorgegalvan.testkairos.models.Comentario;
@@ -41,40 +39,42 @@ public class ShowServiceImp implements ShowService {
         }
 
 
-        // 1. Extraer los IDs de los shows retornados por TVMaze
         List<Long> showIds = respuesta.stream()
                 .filter(res -> res.getShow() != null)
                 .map(res -> res.getShow().getId())
                 .toList();
 
-        // 2. Buscar comentarios guardados en MongoDB para esos showIds
         List<Comentario> comments = comentarioRepository.findByShowIdIn(showIds);
 
-        // 3. Agrupar los comentarios por su showId
         Map<Long, List<Comentario>> commentsByShowId = comments.stream()
                 .collect(Collectors.groupingBy(Comentario::getShowId));
 
-        // 4. Mapear la respuesta agregando los comentarios correspondientes a cada show
         return showMapper.toDtoList(respuesta, commentsByShowId);
     }
 
     @Override
-    public TvMazeShow showById(Long showId) {
+    public DetalleShowDto showById(Long showId) {
+        TvMazeShow show = null;
+
         Optional<TvMazeShow> optionalShow = showRepository.findById(showId);
         if (optionalShow.isPresent()) {
-            return optionalShow.get();
+            show = optionalShow.get();
+        }else{
+            show = tvMazeClient.buscarPorId(showId);
+            if (show != null)
+                show = showRepository.save(show);
         }
-
-        try {
-            TvMazeShow apiShow = tvMazeClient.buscarPorId(showId);
-
-            if (apiShow != null) {
-                return showRepository.save(apiShow);
-            }
-        } catch (feign.FeignException.NotFound e) {
+        if (show == null)
             return null;
-        }
-        return null;
+
+        List<Comentario> comments = comentarioRepository.findByShowId(showId);
+
+        List<ComentarioDto> commentDtos = comments.stream()
+                .map(c -> new ComentarioDto(c.getComment(), c.getRating()))
+                .toList();
+
+        // 4. Retornar el objeto con la información del show + arreglo de comentarios
+        return new DetalleShowDto(show, commentDtos);
     }
 
     @Override

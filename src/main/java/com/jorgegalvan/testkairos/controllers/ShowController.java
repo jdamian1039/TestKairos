@@ -2,6 +2,7 @@ package com.jorgegalvan.testkairos.controllers;
 
 import com.jorgegalvan.testkairos.dto.ComentarioRequest;
 import com.jorgegalvan.testkairos.dto.ComentarioResponse;
+import com.jorgegalvan.testkairos.dto.DetalleShowDto;
 import com.jorgegalvan.testkairos.dto.ShowDto;
 import com.jorgegalvan.testkairos.models.TvMazeShow;
 import com.jorgegalvan.testkairos.services.ShowService;
@@ -29,8 +30,8 @@ public class ShowController {
     }
 
     @GetMapping("/{showId}")
-    public ResponseEntity<TvMazeShow> getShowById(@PathVariable Long showId) {
-        TvMazeShow show = showService.showById(showId);
+    public ResponseEntity<DetalleShowDto    > getShowById(@PathVariable Long showId) {
+        DetalleShowDto show = showService.showById(showId);
         if (show == null) {
             return ResponseEntity.notFound().build();
         }
