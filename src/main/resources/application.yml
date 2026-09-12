@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: testkairos
+  mongodb:
+    uri: mongodb+srv://jorgedgalvanh_db_user:dr6u9QYxaPo3TFvr@cluster0.mjhrkbe.mongodb.net/tvmaze_db?retryWrites=true&w=majority
+  data:
+    mongodb:
+      uri: mongodb+srv://jorgedgalvanh_db_user:dr6u9QYxaPo3TFvr@cluster0.mjhrkbe.mongodb.net/tvmaze_db?retryWrites=true&w=majority
+  main:
+    allow-bean-definition-overriding: true
