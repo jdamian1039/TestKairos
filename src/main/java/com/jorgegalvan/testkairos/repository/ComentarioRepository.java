@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ComentarioRepository extends MongoRepository<Comentario, String> {
     List<Comentario> findByShowId(Long showId);
+
+    List<Comentario> findByShowIdIn(List<Long> showIds);
 }

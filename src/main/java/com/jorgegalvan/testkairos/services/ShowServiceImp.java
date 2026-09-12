@@ -18,7 +18,9 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,13 +34,28 @@ public class ShowServiceImp implements ShowService {
 
     @Override
     public List<ShowDto> buscarShows(String searchQuery) {
-        List<TvMazeResultado> searchResults = tvMazeClient.searchShows(searchQuery);
+        List<TvMazeResultado> respuesta = tvMazeClient.searchShows(searchQuery);
 
-        if (searchResults == null || searchResults.isEmpty()) {
+        if (respuesta == null || respuesta.isEmpty()) {
             return List.of();
         }
 
-        return showMapper.toDtoList(searchResults);
+
+        // 1. Extraer los IDs de los shows retornados por TVMaze
+        List<Long> showIds = respuesta.stream()
+                .filter(res -> res.getShow() != null)
+                .map(res -> res.getShow().getId())
+                .toList();
+
+        // 2. Buscar comentarios guardados en MongoDB para esos showIds
+        List<Comentario> comments = comentarioRepository.findByShowIdIn(showIds);
+
+        // 3. Agrupar los comentarios por su showId
+        Map<Long, List<Comentario>> commentsByShowId = comments.stream()
+                .collect(Collectors.groupingBy(Comentario::getShowId));
+
+        // 4. Mapear la respuesta agregando los comentarios correspondientes a cada show
+        return showMapper.toDtoList(respuesta, commentsByShowId);
     }
 
     @Override
