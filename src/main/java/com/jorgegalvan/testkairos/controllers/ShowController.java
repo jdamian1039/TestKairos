@@ -1,8 +1,12 @@
 package com.jorgegalvan.testkairos.controllers;
 
+import com.jorgegalvan.testkairos.dto.ComentarioRequest;
+import com.jorgegalvan.testkairos.dto.ComentarioResponse;
 import com.jorgegalvan.testkairos.dto.ShowDto;
 import com.jorgegalvan.testkairos.models.TvMazeShow;
 import com.jorgegalvan.testkairos.services.ShowService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,5 +35,11 @@ public class ShowController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(show);
+    }
+
+    @PostMapping("/comments")
+    public ResponseEntity<ComentarioResponse> publicarComment(@Valid @RequestBody ComentarioRequest commentRequest) {
+        ComentarioResponse response = showService.publicarComentario(commentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
