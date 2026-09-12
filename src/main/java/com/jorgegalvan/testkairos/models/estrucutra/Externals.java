@@ -1,4 +1,4 @@
-package com.jorgegalvan.testkairos.models;
+package com.jorgegalvan.testkairos.models.estrucutra;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -7,7 +7,8 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class Network {
-    private String name;
-
+public class Externals {
+    private Integer tvrage;
+    private Integer thetvdb;
+    private String imdb;
 }

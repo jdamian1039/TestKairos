@@ -1,6 +1,7 @@
 package com.jorgegalvan.testkairos.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jorgegalvan.testkairos.models.estrucutra.Network;
 import lombok.Getter;
 import lombok.Setter;
 
